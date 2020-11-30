@@ -8,5 +8,4 @@ class MongoClientObject(object):
         self.collection = self.database[collection]
 
     def insert(self, dataEntry):
-        print(dataEntry)
         self.collection.insert(dataEntry)

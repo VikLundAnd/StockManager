@@ -9,7 +9,7 @@ class Wallet(object):
 
     def buy(self, stock: StockObject, quantity: int):
         print("buying stock")
-        if self.wallet - stock.getPrice(quantity, stock.getAssetPrice()) < 0:
+        if self.wallet - stock.getPrice(quantity, stock.assetPrice) < 0:
             print("Insufficient funds!")
         else:
             self.wallet += stock.buy(quantity)

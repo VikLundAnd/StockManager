@@ -2,6 +2,10 @@ import time
 from MongoClientObject import MongoClientObject
 import threading
 import requests
+import websockets
+import asyncio
+import base64
+import struct
 
 
 class StockObject(object):
@@ -9,31 +13,45 @@ class StockObject(object):
         self.quantity = 0
         self.total = 0
         self.stockTicker = stockTicker
+        self.assetPrice: float = 0
 
-        mainLoopThread = threading.Thread(target=self.loop)
+        self.uri = "wss://streamer.finance.yahoo.com/"
+
+        mainLoopThread = threading.Thread(target=self.between_callback)
         mainLoopThread.start()
 
-    def buy(self, quantity):
+    def buy(self, quantity: int):
         self.quantity = self.quantity + quantity
-        return -self.getPrice(quantity, self.getAssetPrice())
+        return -self.getPrice(quantity, self.assetPrice)
 
-    def sell(self, quantity):
+    def sell(self, quantity: int):
         self.quantity = self.quantity - quantity
-        return self.getPrice(quantity, self.getAssetPrice())
+        return self.getPrice(quantity, self.assetPrice)
 
-    def loop(self):
-        while (True):
-            self.update()
-            time.sleep(1)
+    async def loop(self):
+        async with websockets.connect(self.uri) as websocket:
+            await websocket.send('{"subscribe":["' + self.stockTicker + '"]}')
+            while (True):
+                await self.update(websocket)
+                time.sleep(1)
 
-    def update(self):
-        self.total = self.getPrice(self.quantity, self.getAssetPrice())
+    async def update(self, websocket):
+        self.assetPrice = await self.getAssetPrice(websocket)
+        self.total = self.getPrice(self.quantity, self.assetPrice)
 
-    def getPrice(self, quantity, assetPrice):
+    def getPrice(self, quantity: int, assetPrice):
         return quantity * assetPrice
 
-    def getAssetPrice(self):
-        url = "https://query1.finance.yahoo.com/v8/finance/chart/" + self.stockTicker
-        response = requests.get(url)
-        print(response.json()['chart']['result'][0]['meta']['regularMarketPrice'])
-        return response.json()['chart']['result'][0]['meta']['regularMarketPrice']
+    async def getAssetPrice(self, websocket):
+        received = await websocket.recv()
+        decoded = base64.b64decode(received)
+        bytes = decoded[7:11]
+        data = struct.unpack('f', bytes)[0]
+        return data
+
+    def between_callback(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        loop.run_until_complete(self.loop())
+        loop.close()
