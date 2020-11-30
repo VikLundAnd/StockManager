@@ -35,4 +35,5 @@ class StockObject(object):
     def getAssetPrice(self):
         url = "https://query1.finance.yahoo.com/v8/finance/chart/" + self.stockTicker
         response = requests.get(url)
+        print(response.json()['chart']['result'][0]['meta']['regularMarketPrice'])
         return response.json()['chart']['result'][0]['meta']['regularMarketPrice']

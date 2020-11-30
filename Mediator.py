@@ -1,6 +1,7 @@
 import time
 from MongoClientObject import MongoClientObject
 from StockObject import StockObject
+from Wallet import Wallet
 import threading
 import datetime
 
@@ -8,6 +9,7 @@ class Mediator(object):
     def __init__(self, MongoClient: MongoClientObject):
         self.client = MongoClient
         self.stockChildren: list[StockObject] = []
+        self.wallets: list[Wallet] = []
         self.running = False
 
 
@@ -23,14 +25,20 @@ class Mediator(object):
             time.sleep(1)
 
 
-    def subscribe(self, stock : StockObject):
+    def subscribeStock(self, stock : StockObject):
         self.stockChildren.append(stock)
+
+    def subscribeWallet(self, wallet : Wallet):
+        self.wallets.append(wallet)
 
     def insert(self):
         dataEntry = {
             'time': datetime.datetime.utcnow(),
-            'data': [self.stockMap(stock) for stock in self.stockChildren]
+            'stocks': [self.stockMap(stock) for stock in self.stockChildren]
         }
+
+        for idx, wallet in enumerate(self.wallets):
+            dataEntry["wallet_" + str(idx)] = wallet.getTotal()
 
         self.client.insert(dataEntry)
 

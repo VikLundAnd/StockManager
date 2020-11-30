@@ -1,19 +1,23 @@
-import yfinance as yf
-import sys
-import matplotlib.pyplot as plot
 from MongoClientObject import MongoClientObject
 from StockObject import StockObject
 from Mediator import Mediator
+from Wallet import Wallet
+import base64
+import struct
 
 
 Uri = "mongodb+srv://dbUser:dbUserPassword123@cluster0-tefh6.azure.mongodb.net/test?authSource=admin&replicaSet=Cluster0-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass%20Community&retryWrites=true&ssl=true"
-m = MongoClientObject(Uri, "dbName", "First try")
-Stock = StockObject("MSFT")
-Mediator = Mediator(m)
+Client = MongoClientObject(Uri, "StockManager", "Test for Tobi")
+MicrosoftStock = StockObject("MSFT")
+AppleStock = StockObject("AAPL")
+Mediator = Mediator(Client)
+Wallet = Wallet(10000)
 
-Mediator.subscribe(Stock)
+Mediator.subscribeStock(MicrosoftStock)
+Mediator.subscribeStock(AppleStock)
+Mediator.subscribeWallet(Wallet)
 
 Mediator.start()
 
 while (True):
-    Stock.buy(1)
+    Wallet.buy(AppleStock, 1)
