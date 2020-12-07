@@ -12,8 +12,6 @@ class Mediator(object):
         self.wallets: list[Wallet] = []
         self.running = False
 
-
-
     def start(self):
         self.running = True
         runThread = threading.Thread(target=self.run)
@@ -23,7 +21,6 @@ class Mediator(object):
         while (self.running):
             self.insert()
             time.sleep(1)
-
 
     def subscribeStock(self, stock : StockObject):
         self.stockChildren.append(stock)

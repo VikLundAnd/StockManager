@@ -17,6 +17,14 @@ class StockObject(object):
 
         self.uri = "wss://streamer.finance.yahoo.com/"
 
+        with websockets.connect(self.uri) as websocket:
+            websocket.send('{"subscribe":["' + self.stockTicker + '"]}')
+            received = websocket.recv()
+            decoded = base64.b64decode(received)
+            bytes = decoded[7:11]
+            data = struct.unpack('f', bytes)[0]
+            self.assetPrice =  data
+
         mainLoopThread = threading.Thread(target=self.between_callback)
         mainLoopThread.start()
 
