@@ -12,8 +12,6 @@ class Mediator(object):
         self.wallets: list[Wallet] = []
         self.running = False
 
-
-
     def start(self):
         self.running = True
         runThread = threading.Thread(target=self.run)

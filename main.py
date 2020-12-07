@@ -7,11 +7,11 @@ import struct
 
 
 Uri = "mongodb+srv://dbUser:dbUserPassword123@cluster0-tefh6.azure.mongodb.net/test?authSource=admin&replicaSet=Cluster0-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass%20Community&retryWrites=true&ssl=true"
-Client = MongoClientObject(Uri, "StockManager", "Test for Tobi")
+Client = MongoClientObject(Uri, "StockManager", "Test for Viktor")
 MicrosoftStock = StockObject("MSFT")
-AppleStock = StockObject("AAPL")
+AppleStock = StockObject("ROKU")
 Mediator = Mediator(Client)
-Wallet = Wallet(10000)
+Wallet = Wallet(5000)
 
 Mediator.subscribeStock(MicrosoftStock)
 Mediator.subscribeStock(AppleStock)
