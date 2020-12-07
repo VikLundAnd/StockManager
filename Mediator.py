@@ -22,7 +22,6 @@ class Mediator(object):
             self.insert()
             time.sleep(1)
 
-
     def subscribeStock(self, stock : StockObject):
         self.stockChildren.append(stock)
 
