@@ -13,15 +13,13 @@ class StockObject(object):
         self.quantity = 0
         self.total = 0
         self.stockTicker = stockTicker
-        self.assetPrice: float = 0
+        self.assetPrice: float = self.getClosingPrice()
         self.running = False
 
         self.uri = "wss://streamer.finance.yahoo.com/"
 
         mainLoopThread = threading.Thread(target=self.between_callback)
         mainLoopThread.start()
-        while(not self.running):
-            pass
 
     def buy(self, quantity: int) -> float:
         self.quantity = self.quantity + quantity
@@ -64,3 +62,9 @@ class StockObject(object):
 
         loop.run_until_complete(self.loop())
         loop.close()
+
+    def getClosingPrice(self):
+        uri = 'https://query1.finance.yahoo.com/v8/finance/chart/' + self.stockTicker
+        req = requests.get(uri)
+        data = req.json()
+        return data['chart']['result'][0]['meta']['regularMarketPrice']

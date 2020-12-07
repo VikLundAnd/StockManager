@@ -7,9 +7,9 @@ import struct
 import time
 
 Uri = "mongodb+srv://dbUser:dbUserPassword123@cluster0-tefh6.azure.mongodb.net/test?authSource=admin&replicaSet=Cluster0-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass%20Community&retryWrites=true&ssl=true"
-Client = MongoClientObject(Uri, "StockManager", "Test for Tobi 7")
+Client = MongoClientObject(Uri, "StockManager", "Test for Tobi 9")
 #MicrosoftStock = StockObject("MSFT")
-AppleStock = StockObject("AAPL")
+AppleStock = StockObject("ISS.CO")
 Mediator = Mediator(Client)
 Wallet = Wallet(10000)
 
