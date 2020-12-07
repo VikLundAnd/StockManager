@@ -14,32 +14,33 @@ class StockObject(object):
         self.total = 0
         self.stockTicker = stockTicker
         self.assetPrice: float = 0
+        self.running = False
 
         self.uri = "wss://streamer.finance.yahoo.com/"
 
-        with websockets.connect(self.uri) as websocket:
-            websocket.send('{"subscribe":["' + self.stockTicker + '"]}')
-            received = websocket.recv()
-            decoded = base64.b64decode(received)
-            bytes = decoded[7:11]
-            data = struct.unpack('f', bytes)[0]
-            self.assetPrice =  data
-
         mainLoopThread = threading.Thread(target=self.between_callback)
         mainLoopThread.start()
+        while(not self.running):
+            pass
 
-    def buy(self, quantity: int):
+    def buy(self, quantity: int) -> float:
         self.quantity = self.quantity + quantity
-        return -self.getPrice(quantity, self.assetPrice)
+        price = self.getPrice(quantity, self.assetPrice)
+        self.total = self.getPrice(self.quantity,self.assetPrice)
+        return -price
 
     def sell(self, quantity: int):
         self.quantity = self.quantity - quantity
-        return self.getPrice(quantity, self.assetPrice)
+        price = self.getPrice(quantity, self.assetPrice)
+        self.total = self.getPrice(self.quantity,self.assetPrice)
+        return price
 
     async def loop(self):
         async with websockets.connect(self.uri) as websocket:
             await websocket.send('{"subscribe":["' + self.stockTicker + '"]}')
-            while (True):
+            await self.update(websocket)
+            self.running = True
+            while (self.running):
                 await self.update(websocket)
                 time.sleep(1)
 

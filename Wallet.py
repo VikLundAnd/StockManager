@@ -2,7 +2,7 @@ from StockObject import StockObject
 
 class Wallet(object):
     def __init__(self, wallet):
-        self.wallet = wallet
+        self.wallet : float = wallet
 
     def getTotal(self):
         return self.wallet
